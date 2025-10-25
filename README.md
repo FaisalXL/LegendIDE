@@ -1,16 +1,76 @@
-# React + Vite
+# LegendIDE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Replit-like code editor built with React and Vite. Features a multi-language code editor with syntax highlighting, integrated terminal, file explorer, and code execution capabilities.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🎨 **Multi-language Code Editor** with syntax highlighting
+- 📁 **File Explorer** with directory navigation
+- 💻 **Integrated Terminal** with command execution
+- ▶️ **Run Button** for executing code in multiple languages (Python, C++, JavaScript, Go, Ruby)
+- 🗂️ **Language Tabs** for different file types
+- 🎯 **Default Workspace** set to `dev/codeforces` for competitive programming
 
-## React Compiler
+## How to Run
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
+- Node.js (version 14 or higher)
+- npm or yarn
 
-## Expanding the ESLint configuration
+### Installation & Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/FaisalXL/LegendIDE.git
+   cd LegendIDE
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the terminal server (Required for terminal functionality):**
+   ```bash
+   node terminal-server.cjs
+   ```
+   This will start the backend server on port 3001 for terminal and file operations.
+
+4. **Start the development server (In a new terminal):**
+   ```bash
+   npm run dev
+   ```
+   This will start the React app on http://localhost:5173
+
+5. **Open your browser:**
+   Navigate to http://localhost:5173 to use the IDE.
+
+### Important Notes
+
+- **Both servers must be running**: The terminal server (port 3001) and the React dev server (port 5173)
+- The file explorer and terminal default to the `dev/codeforces` directory
+- Sample files are included in `dev/codeforces/` for testing
+
+### Usage
+
+1. Use the file explorer on the left to navigate and open files
+2. Edit code in the main editor area
+3. Use the integrated terminal at the bottom for command-line operations
+4. Click the "Run" button to execute your code
+5. Switch between different file types using the language tabs
+
+## Tech Stack
+
+- **Frontend**: React + Vite
+- **Backend**: Node.js with Express
+- **Terminal**: node-pty for terminal emulation
+- **Editor**: Monaco Editor (VS Code editor)
+- **Styling**: CSS with modern design
+
+## Development
+
+For development, you can modify the components in the `src/components/` directory:
+- `Editor.jsx` - Main code editor
+- `FileExplorer.jsx` - File navigation
+- `Terminal.jsx` - Terminal interface
+- `LanguageTabs.jsx` - Language switching tabs
