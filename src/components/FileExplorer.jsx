@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { 
   Box, 
   Typography, 
@@ -23,7 +23,7 @@ import {
   Add as AddIcon
 } from '@mui/icons-material';
 
-export default function FileExplorer({ onRun, onFileSelect }) {
+const FileExplorer = forwardRef(function FileExplorer({ onRun, onFileSelect }, ref) {
   const [files, setFiles] = useState([]);
   const [currentPath, setCurrentPath] = useState('');
   const [expandedFolders, setExpandedFolders] = useState(new Set());
@@ -50,6 +50,11 @@ export default function FileExplorer({ onRun, onFileSelect }) {
     const defaultPath = '';
     fetchFiles(defaultPath);
   }, []);
+
+  // Expose refresh method to parent component
+  useImperativeHandle(ref, () => ({
+    refreshFiles: () => fetchFiles(currentPath)
+  }));
 
   const handleFileClick = async (file) => {
     if (file.isDirectory) {
@@ -322,11 +327,17 @@ export default function FileExplorer({ onRun, onFileSelect }) {
             {files.map((file, index) => (
               <ListItem 
                 key={index}
-                button
+                component="button"
                 onClick={() => handleFileClick(file)}
                 sx={{ 
                   py: 0.5,
-                  '&:hover': { bgcolor: '#404040' }
+                  bgcolor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  width: '100%',
+                  textAlign: 'left',
+                  '&:hover': { bgcolor: '#404040' },
+                  '&:focus': { bgcolor: '#404040', outline: 'none' }
                 }}
               >
                 <ListItemIcon sx={{ minWidth: 30 }}>
@@ -412,4 +423,6 @@ export default function FileExplorer({ onRun, onFileSelect }) {
       </Dialog>
     </Box>
   );
-}
+});
+
+export default FileExplorer;

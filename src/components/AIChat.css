@@ -173,3 +173,109 @@
 .ai-chat-messages::-webkit-scrollbar-thumb:hover {
   background: #444;
 }
+
+/* Mode Toggle */
+.ai-chat-mode-toggle {
+  display: flex;
+  padding: 8px 16px;
+  gap: 4px;
+  border-bottom: 1px solid #333;
+  background: #252526;
+}
+
+.mode-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.mode-button:hover:not(:disabled) {
+  background: #2d2d30;
+  color: #d4d4d4;
+  border-color: #555;
+}
+
+.mode-button.active {
+  background: #007acc;
+  color: white;
+  border-color: #007acc;
+}
+
+.mode-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Permission Buttons */
+.permission-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #444;
+}
+
+.permission-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yes-btn {
+  background: #28a745;
+  color: white;
+}
+
+.yes-btn:hover:not(:disabled) {
+  background: #218838;
+}
+
+.no-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.no-btn:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.permission-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Permission message styling */
+.message.permission .message-content {
+  background: #3a3a00;
+  border: 1px solid #666600;
+  color: #ffff99;
+}
+
+/* Loading spinner animation */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
