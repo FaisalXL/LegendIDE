@@ -47,7 +47,7 @@ export default function FileExplorer({ onRun, onFileSelect }) {
 
   useEffect(() => {
     // Default to dev/codeforces directory
-    const defaultPath = 'dev/codeforces';
+    const defaultPath = '';
     fetchFiles(defaultPath);
   }, []);
 

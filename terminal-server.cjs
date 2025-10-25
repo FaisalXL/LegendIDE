@@ -138,198 +138,52 @@ io.on('connection', (socket) => {
     ptyProcess.write(data);
   });
 
-  socket.on('execute:code', ({ code, language }) => {
-    const tempDir = os.tmpdir();
-    let filePath;
-    let commands = [];
-    let fileExtension;
-
-    // Language execution mapping
-    const languageConfig = {
-      // Interpreted Languages
-      'python': {
-        extension: 'py',
-        commands: [`python3 {{file}}`],
-        fallbackCommands: [`python {{file}}`]
-      },
-      'javascript': {
-        extension: 'js',
-        commands: [`node {{file}}`]
-      },
-      'ruby': {
-        extension: 'rb',
-        commands: [`ruby {{file}}`]
-      },
-      'php': {
-        extension: 'php',
-        commands: [`php {{file}}`]
-      },
-      'perl': {
-        extension: 'pl',
-        commands: [`perl {{file}}`]
-      },
-      'lua': {
-        extension: 'lua',
-        commands: [`lua {{file}}`]
-      },
-      'r': {
-        extension: 'r',
-        commands: [`Rscript {{file}}`]
-      },
-      'shell': {
-        extension: 'sh',
-        commands: [`chmod +x {{file}} && {{file}}`]
-      },
-      'bash': {
-        extension: 'sh',
-        commands: [`chmod +x {{file}} && bash {{file}}`]
-      },
-      'powershell': {
-        extension: 'ps1',
-        commands: [`powershell -ExecutionPolicy Bypass -File {{file}}`]
-      },
-      
-      // Compiled Languages
-      'c': {
-        extension: 'c',
-        commands: [
-          `gcc {{file}} -o {{output}} && {{output}}`,
-          `clang {{file}} -o {{output}} && {{output}}`
-        ]
-      },
-      'cpp': {
-        extension: 'cpp',
-        commands: [
-          `g++ {{file}} -o {{output}} && {{output}}`,
-          `clang++ {{file}} -o {{output}} && {{output}}`
-        ]
-      },
-      'java': {
-        extension: 'java',
-        commands: [`javac {{file}} && java {{classname}}`]
-      },
-      'go': {
-        extension: 'go',
-        commands: [`go run {{file}}`]
-      },
-      'rust': {
-        extension: 'rs',
-        commands: [`rustc {{file}} -o {{output}} && {{output}}`]
-      },
-      'kotlin': {
-        extension: 'kt',
-        commands: [`kotlinc {{file}} -include-runtime -d {{jar}} && java -jar {{jar}}`]
-      },
-      'swift': {
-        extension: 'swift',
-        commands: [`swift {{file}}`]
-      },
-      'dart': {
-        extension: 'dart',
-        commands: [`dart {{file}}`]
-      },
-      
-      // Other Languages
-      'typescript': {
-        extension: 'ts',
-        commands: [
-          `npx ts-node {{file}}`,
-          `tsc {{file}} && node {{jsfile}}`
-        ]
-      },
-      'coffeescript': {
-        extension: 'coffee',
-        commands: [`coffee {{file}}`]
-      },
-      'scala': {
-        extension: 'scala',
-        commands: [`scala {{file}}`]
-      },
-      'haskell': {
-        extension: 'hs',
-        commands: [
-          `runhaskell {{file}}`,
-          `ghc {{file}} -o {{output}} && {{output}}`
-        ]
-      },
-      'elixir': {
-        extension: 'ex',
-        commands: [`elixir {{file}}`]
-      },
-      'erlang': {
-        extension: 'erl',
-        commands: [`escript {{file}}`]
-      },
-      'clojure': {
-        extension: 'clj',
-        commands: [`clojure {{file}}`]
-      }
-    };
-
-    const config = languageConfig[language.toLowerCase()];
-    
-    if (!config) {
-      ptyProcess.write(`Error: Language '${language}' is not supported for execution.\n`);
-      ptyProcess.write(`Supported languages: ${Object.keys(languageConfig).join(', ')}\n`);
+  socket.on('execute:code', ({ filePath }) => {
+    if (!filePath) {
+      ptyProcess.write('echo "Error: No file selected to run"\r');
       return;
     }
 
-    fileExtension = config.extension;
-    filePath = path.join(tempDir, `temp_script.${fileExtension}`);
+    // Get file extension to determine language
+    const ext = path.extname(filePath).toLowerCase();
     
-    // Generate output file path for compiled languages
-    const outputPath = path.join(tempDir, 'temp_executable');
-    const jarPath = path.join(tempDir, 'temp_script.jar');
-    const jsPath = path.join(tempDir, 'temp_script.js');
+    // Simple language-to-command mapping
+    const runCommands = {
+      '.py': 'python3',
+      '.js': 'node', 
+      '.cpp': 'g++ -o a.out && ./a.out',
+      '.c': 'gcc -o a.out && ./a.out',
+      '.java': 'javac && java',
+      '.go': 'go run',
+      '.rb': 'ruby',
+      '.php': 'php',
+      '.sh': 'bash',
+      '.pl': 'perl',
+      '.rs': 'rustc -o a.out && ./a.out'
+    };
+
+    const command = runCommands[ext];
     
-    // Extract class name for Java
-    const className = language === 'java' ? 
-      (code.match(/public\s+class\s+(\w+)/) || ['', 'TempScript'])[1] : 
-      'TempScript';
-
-    // Prepare commands with placeholders replaced
-    commands = config.commands.map(cmd => 
-      cmd.replace(/\{\{file\}\}/g, filePath)
-         .replace(/\{\{output\}\}/g, outputPath)
-         .replace(/\{\{jar\}\}/g, jarPath)
-         .replace(/\{\{jsfile\}\}/g, jsPath)
-         .replace(/\{\{classname\}\}/g, className)
-    );
-
-    // Add fallback commands if available
-    if (config.fallbackCommands) {
-      commands = commands.concat(config.fallbackCommands.map(cmd => 
-        cmd.replace(/\{\{file\}\}/g, filePath)
-           .replace(/\{\{output\}\}/g, outputPath)
-           .replace(/\{\{jar\}\}/g, jarPath)
-           .replace(/\{\{jsfile\}\}/g, jsPath)
-           .replace(/\{\{classname\}\}/g, className)
-      ));
+    if (!command) {
+      ptyProcess.write(`echo "Error: File type '${ext}' is not supported for execution"\r`);
+      return;
     }
 
-    // Write the code to temporary file
-    fs.writeFile(filePath, code, (err) => {
-      if (err) {
-        console.error('Error writing temp file:', err);
-        ptyProcess.write('Error creating temporary file for execution.\n');
-        return;
-      }
-
-      // Try executing with the first command, fallback to others if needed
-      const executeCommand = (commandIndex = 0) => {
-        if (commandIndex >= commands.length) {
-          ptyProcess.write(`Error: Unable to execute ${language} code. Please ensure the required compiler/interpreter is installed.\n`);
-          return;
-        }
-
-        const command = commands[commandIndex];
-        // Clear the terminal and show a clean execution message
-        ptyProcess.write(`\n# Running ${language} code...\n`);
-        ptyProcess.write(`${command}\n`);
-      };
-
-      executeCommand();
-    });
+    // For compiled languages, handle compilation + execution
+    if (ext === '.cpp' || ext === '.c') {
+      const fileName = path.basename(filePath);
+      ptyProcess.write(`echo "Compiling and running ${fileName}..." && ${command.replace('a.out', fileName.replace(ext, ''))} "${filePath}"\r`);
+    } else if (ext === '.java') {
+      const className = path.basename(filePath, '.java');
+      ptyProcess.write(`echo "Compiling and running ${className}.java..." && javac "${filePath}" && java -cp "${path.dirname(filePath)}" ${className}\r`);
+    } else if (ext === '.rs') {
+      const fileName = path.basename(filePath);
+      ptyProcess.write(`echo "Compiling and running ${fileName}..." && ${command.replace('a.out', fileName.replace(ext, ''))} "${filePath}"\r`);
+    } else {
+      // For interpreted languages, just run directly
+      const fileName = path.basename(filePath);
+      ptyProcess.write(`echo "Running ${fileName}..." && ${command} "${filePath}"\r`);
+    }
   });
 
   socket.on('disconnect', () => {

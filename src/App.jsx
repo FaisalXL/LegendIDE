@@ -4,7 +4,10 @@ import Editor from './components/Editor';
 import Terminal from './components/Terminal';
 import FileExplorer from './components/FileExplorer';
 import LanguageTabs from './components/LanguageTabs';
-import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import AIChat from './components/AIChat';
+import { Box, CssBaseline, ThemeProvider, createTheme, IconButton } from '@mui/material';
+import { FiTerminal, FiMessageSquare, FiX } from 'react-icons/fi';
+import './App.css';
 
 const darkTheme = createTheme({
   palette: {
@@ -15,6 +18,8 @@ const darkTheme = createTheme({
 function App() {
   const [tabs, setTabs] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
+  const [isTerminalVisible, setIsTerminalVisible] = useState(true);
+  const [isAIChatVisible, setIsAIChatVisible] = useState(true);
   const terminalRef = useRef();
 
   // Debounced save function
@@ -108,20 +113,62 @@ function App() {
     const socket = terminalRef.current?.socket;
     if (socket && tabs.length > 0) {
       const currentTab = tabs[activeTab];
-      socket.emit('execute:code', { code: currentTab.code, language: currentTab.language });
+      if (currentTab.path) {
+        socket.emit('execute:code', { filePath: currentTab.path });
+      } else {
+        console.error('No file path available for execution');
+      }
     }
   };
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#1e1e1e' }}>
-        <SplitPane style={{ height: '100%', position: 'relative' }}>
-          <div style={{ minWidth: 200, width: '15%' }}>
-            <FileExplorer onRun={handleRun} onFileSelect={handleFileSelect} />
-          </div>
-          <SplitPane style={{ width: '85%' }}>
-            <div style={{ width: '60%', minWidth: 300 }}>
+      <Box sx={{ height: '100vh', display: 'flex', bgcolor: '#1e1e1e' }}>
+        {/* Left Panel - File Explorer */}
+        <Box sx={{ width: '250px', minWidth: '200px', borderRight: '1px solid #333' }}>
+          <FileExplorer onRun={handleRun} onFileSelect={handleFileSelect} />
+        </Box>
+
+        {/* Center Panel - Code Editor with Terminal at Bottom */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
+          {/* Top Bar with Toggle Buttons */}
+          <Box sx={{ 
+            height: '40px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            px: 2,
+            borderBottom: '1px solid #333',
+            bgcolor: '#252526'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton 
+                size="small" 
+                onClick={() => setIsTerminalVisible(!isTerminalVisible)}
+                sx={{ color: isTerminalVisible ? '#007acc' : '#888' }}
+              >
+                <FiTerminal />
+              </IconButton>
+              <IconButton 
+                size="small" 
+                onClick={() => setIsAIChatVisible(!isAIChatVisible)}
+                sx={{ color: isAIChatVisible ? '#007acc' : '#888' }}
+              >
+                <FiMessageSquare />
+              </IconButton>
+            </Box>
+          </Box>
+
+          {/* Code Editor Area with Terminal */}
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {/* Editor Section */}
+            <Box sx={{ 
+              flex: isTerminalVisible ? '1 1 70%' : '1 1 100%', 
+              display: 'flex', 
+              flexDirection: 'column',
+              minHeight: 0
+            }}>
               {tabs.length > 0 ? (
                 <>
                   <LanguageTabs 
@@ -130,11 +177,13 @@ function App() {
                     onChange={handleTabChange}
                     onCloseTab={handleCloseTab}
                   />
-                  <Editor 
-                    value={tabs[activeTab].code} 
-                    onChange={handleCodeChange}
-                    language={tabs[activeTab].language}
-                  />
+                  <Box sx={{ flex: 1, minHeight: 0 }}>
+                    <Editor 
+                      value={tabs[activeTab].code} 
+                      onChange={handleCodeChange}
+                      language={tabs[activeTab].language}
+                    />
+                  </Box>
                 </>
               ) : (
                 <Box sx={{ 
@@ -148,12 +197,30 @@ function App() {
                   Select a file from the explorer to start editing
                 </Box>
               )}
-            </div>
-            <div style={{ width: '40%', minWidth: 300 }}>
-              <Terminal ref={terminalRef} />
-            </div>
-          </SplitPane>
-        </SplitPane>
+            </Box>
+            
+            {/* Terminal Section */}
+            {isTerminalVisible && (
+              <Box sx={{ 
+                flex: '0 0 30%', 
+                borderTop: '1px solid #333',
+                minHeight: '200px'
+              }}>
+                <Terminal ref={terminalRef} />
+              </Box>
+            )}
+          </Box>
+        </Box>
+
+        {/* Right Panel - AI Chat */}
+        {isAIChatVisible && (
+          <Box sx={{ width: '350px', minWidth: '300px' }}>
+            <AIChat 
+              isVisible={isAIChatVisible} 
+              onToggle={() => setIsAIChatVisible(false)} 
+            />
+          </Box>
+        )}
       </Box>
     </ThemeProvider>
   );
