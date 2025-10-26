@@ -207,6 +207,14 @@ function App() {
     console.log('Open file clicked - focus on file explorer');
   };
 
+  const handleFilesModified = (modifiedFiles) => {
+    console.log('Files modified by Claude agent:', modifiedFiles);
+    // Refresh file explorer when Claude agent modifies files
+    if (fileExplorerRef.current?.refreshFiles) {
+      fileExplorerRef.current.refreshFiles();
+    }
+  };
+
   // Helper function to determine language from file extension
   const getLanguageFromExtension = (extension) => {
     const languageMap = {
@@ -333,6 +341,7 @@ function App() {
               <AIChat 
                 isVisible={isAIChatVisible} 
                 onToggle={() => setIsAIChatVisible(false)} 
+                onFilesModified={handleFilesModified}
               />
             </Box>
           )}

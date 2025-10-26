@@ -20,7 +20,8 @@ import {
   ExpandLess,
   ExpandMore,
   PlayArrow,
-  Add as AddIcon
+  Add as AddIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
 
 const FileExplorer = forwardRef(function FileExplorer({ onRun, onFileSelect }, ref) {
@@ -314,6 +315,14 @@ const FileExplorer = forwardRef(function FileExplorer({ onRun, onFileSelect }, r
               sx={{ color: 'white', fontSize: '12px' }}
             >
               New File
+            </Button>
+            <Button 
+              onClick={() => fetchFiles(currentPath)}
+              size="small"
+              startIcon={<RefreshIcon />}
+              sx={{ color: 'white', fontSize: '12px' }}
+            >
+              Refresh
             </Button>
           </Box>
         )}

@@ -1,0 +1,9 @@
+This is a test file created to test the delete functionality of the Claude agent.
+You can safely delete this file using the Claude agent's new delete_file tool.
+
+Test content:
+- Line 1
+- Line 2
+- Line 3
+
+This file should be deleted by the Claude agent to verify the delete functionality works correctly.
