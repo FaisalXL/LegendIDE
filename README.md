@@ -1,76 +1,49 @@
 # LegendIDE
 
-A Replit-like code editor built with React and Vite. Features a multi-language code editor with syntax highlighting, integrated terminal, file explorer, and code execution capabilities.
+**LegendIDE** — a collaborative web IDE built with React + Vite.  
+A core feature: **shared AI context across teammates** — the IDE preserves team context (edits, reviews, and decisions) so integrated AI agents can understand each teammate’s intent and the project’s decision history.
 
-## Features
+---
+- [Find it on Devpost](https://devpost.com/software/legendide  )
+---
 
-- 🎨 **Multi-language Code Editor** with syntax highlighting
-- 📁 **File Explorer** with directory navigation
-- 💻 **Integrated Terminal** with command execution
-- ▶️ **Run Button** for executing code in multiple languages (Python, C++, JavaScript, Go, Ruby)
-- 🗂️ **Language Tabs** for different file types
-- 🎯 **Default Workspace** set to `dev/codeforces` for competitive programming
+## Key Features
+- Real-time multi-file code editor with syntax highlighting (Monaco Editor)  
+- Integrated terminal (node-pty) and run button (supports Python, C++, JS, Go, Ruby)  
+- File explorer and workspace defaults for competitive programming (`dev/codeforces/`)  
+- **Shared context persistence**: captures edits, decisions and history so AI assistants can reason across teammates’ activity  
+- Lightweight, Vite + React frontend with a node backend for terminal/file ops
 
-## How to Run
+---
 
-### Prerequisites
-- Node.js (version 14 or higher)
-- npm or yarn
+## Tech Stack
+- Frontend: React + Vite, Monaco Editor  
+- Backend: Node.js (terminal server using `node-pty`)  
+- Packaging: npm / package.json
 
-### Installation & Setup
+---
 
-1. **Clone the repository:**
+## Local Setup (developer)
+1. Clone:
    ```bash
    git clone https://github.com/FaisalXL/LegendIDE.git
    cd LegendIDE
    ```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+2. Install:
 
-3. **Start the terminal server (Required for terminal functionality):**
-   ```bash
-   node terminal-server.cjs
-   ```
-   This will start the backend server on port 3001 for terminal and file operations.
+```
+npm install
+```
+3. Start terminal backend:
+```
+node terminal-server.cjs
+```
 
-4. **Start the development server (In a new terminal):**
-   ```bash
-   npm run dev
-   ```
-   This will start the React app on http://localhost:5173
+Start frontend:
+```
+npm run dev
+```
 
-5. **Open your browser:**
-   Navigate to http://localhost:5173 to use the IDE.
 
-### Important Notes
-
-- **Both servers must be running**: The terminal server (port 3001) and the React dev server (port 5173)
-- The file explorer and terminal default to the `dev/codeforces` directory
-- Sample files are included in `dev/codeforces/` for testing
-
-### Usage
-
-1. Use the file explorer on the left to navigate and open files
-2. Edit code in the main editor area
-3. Use the integrated terminal at the bottom for command-line operations
-4. Click the "Run" button to execute your code
-5. Switch between different file types using the language tabs
-
-## Tech Stack
-
-- **Frontend**: React + Vite
-- **Backend**: Node.js with Express
-- **Terminal**: node-pty for terminal emulation
-- **Editor**: Monaco Editor (VS Code editor)
-- **Styling**: CSS with modern design
-
-## Development
-
-For development, you can modify the components in the `src/components/` directory:
-- `Editor.jsx` - Main code editor
-- `FileExplorer.jsx` - File navigation
-- `Terminal.jsx` - Terminal interface
-- `LanguageTabs.jsx` - Language switching tabs
+Built during CalHacks. Inspired by collaborative IDEs and AI-assisted coding workflows.
